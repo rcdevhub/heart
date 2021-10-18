@@ -73,6 +73,7 @@ model_vars = ['Age','RestingBP','Cholesterol']
 sex_conv = (train_raw['Sex']=='M').astype(int)
 
 train2 = train_raw[model_vars]
+train2 = train2.dropna()
 train2.loc[:,'Sex'] = sex_conv.copy()
 train2 = train2.values
 
@@ -94,5 +95,9 @@ conf = confusion_matrix(Y_train,preds_train)
 rep = classification_report(Y_train,preds_train)
 f1 = f1_score(Y_train,preds_train,average='macro')
 
-''' --------------------------Classify--------------------'''
-test
+''' --------------------------Test--------------------'''
+
+test_record = np.array([[40,140,289,1]])
+test_rec_std = scaler.transform(test_record)
+preds_test_rec = model.predict(test_rec_std)
+probs_test_rec = model.predict_proba(test_rec_std)
