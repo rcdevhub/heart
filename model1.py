@@ -76,23 +76,33 @@ plt.style.use('dark_background')
 sns.pairplot(train_raw[['Sex','Age','RestingBP','Cholesterol','HeartDisease']],
              hue='HeartDisease',
              palette='colorblind')
+# plt.savefig('plots/pairplot_modelled.png',format='png',dpi=300)
+
+# Pairplot with zero cholesterol values removed
+plt.figure()
+plt.style.use('dark_background')
+sns.pairplot(train_raw[['Sex','Age','RestingBP','Cholesterol','HeartDisease']][train_raw['Cholesterol']!=0],
+             hue='HeartDisease',
+             palette='colorblind')
 plt.savefig('plots/pairplot_modelled.png',format='png',dpi=300)
 
 ''' --------------------------Prepare data-------------------'''
 
-model_vars = ['Age','RestingBP','Cholesterol']
+model_vars = ['Age','RestingBP','Cholesterol','HeartDisease']
 sex_conv = (train_raw['Sex']=='M').astype(int)
 
 train2 = train_raw[model_vars]
 train2 = train2.dropna()
+# Remove suspicious zero values of cholesterol
+train2 = train2[train2['Cholesterol']!=0]
 train2.loc[:,'Sex'] = sex_conv.copy()
-train2 = train2.values
+train2_xval = train2.drop('HeartDisease',axis=1).values
 
-scaler = StandardScaler().fit(train2)
-train_std = scaler.transform(train2)
+scaler = StandardScaler().fit(train2_xval)
+train_std = scaler.transform(train2_xval)
 
 X_train = train_std
-Y_train = train_raw['HeartDisease'].values
+Y_train = train2['HeartDisease'].values
 
 ''' --------------------------Classify--------------------'''
 
@@ -123,8 +133,8 @@ ax.plot(fpr,tpr,color='purple',label=f'AUC={auc:0.2f}')
 ax.plot([0,1],[0,1],ls='--',color='gray')
 plt.title('Receiver Operating Characteristic')
 plt.legend()
-plt.ylabel('False Positive Rate')
-plt.xlabel('True Positive Rate')
+plt.xlabel('False Positive Rate')
+plt.ylabel('True Positive Rate')
 plt.savefig('plots/roc.png',format='png',dpi=300,bbox_inches='tight')
 
 ''' --------------------------Save model--------------------'''
