@@ -2,8 +2,6 @@
 *.csv
 *.png
 *.jpg
-!plots/pairplot_modelled.png
-!plots/roc.png
 
 # Directories
 images/
