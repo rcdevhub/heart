@@ -18,6 +18,7 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import time
 import copy
+import pickle
 
 from sklearn.preprocessing import StandardScaler
 from sklearn.linear_model import LogisticRegression, LogisticRegressionCV
@@ -66,6 +67,16 @@ freq_vars = ['Age','RestingBP','Cholesterol']
 freqs = {}
 for item in freq_vars:
     freqs[item] = freq_by_var_bin(train_raw,target='HeartDisease',var=item,bins=6)
+    
+# Predictor variables pairplot
+
+plt.figure()
+# plt.style.use('default')
+plt.style.use('dark_background')
+sns.pairplot(train_raw[['Sex','Age','RestingBP','Cholesterol','HeartDisease']],
+             hue='HeartDisease',
+             palette='colorblind')
+plt.savefig('plots/pairplot_modelled.png',format='png',dpi=300)
 
 ''' --------------------------Prepare data-------------------'''
 
@@ -94,6 +105,33 @@ probs_train = model.predict_proba(X_train)
 conf = confusion_matrix(Y_train,preds_train)
 rep = classification_report(Y_train,preds_train)
 f1 = f1_score(Y_train,preds_train,average='macro')
+auc = roc_auc_score(Y_train,preds_train)
+
+results = {'conf':conf,
+           'rep':rep,
+           'f1':f1,
+           'auc':auc}
+
+# Plot ROC curve
+fpr,tpr,thresh = roc_curve(Y_train,probs_train[:,1],drop_intermediate=True)
+
+# plt.style.use('default')
+plt.style.use('dark_background')
+fig = plt.figure()
+ax = fig.add_subplot(1,1,1)
+ax.plot(fpr,tpr,color='purple',label=f'AUC={auc:0.2f}')
+ax.plot([0,1],[0,1],ls='--',color='gray')
+plt.title('Receiver Operating Characteristic')
+plt.legend()
+plt.ylabel('False Positive Rate')
+plt.xlabel('True Positive Rate')
+plt.savefig('plots/roc.png',format='png',dpi=300,bbox_inches='tight')
+
+''' --------------------------Save model--------------------'''
+
+pickle.dump(scaler,open('std_scaler.sav','wb'))
+pickle.dump(model,open('cls_model.sav','wb'))
+pickle.dump(results,open('output/model_results.sav','wb'))
 
 ''' --------------------------Test--------------------'''
 
