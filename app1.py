@@ -22,8 +22,6 @@ from sklearn.linear_model import LogisticRegressionCV
 from sklearn.metrics import (f1_score,classification_report,confusion_matrix,
                              roc_auc_score,roc_curve)
 
-os.chdir('C://Code/Kaggle/heart-failure/')
-
 # Headers
 st.title('Heart Disease Classification')
 st.image('heart-black.jpg')
@@ -35,7 +33,6 @@ sex_button = st.sidebar.radio('Gender',('Male','Female'))
 age_slider = st.sidebar.slider('Age',20,100,60)
 bp_slider = st.sidebar.slider('Resting blood pressure',100,200,150)
 chol_slider = st.sidebar.slider('Serum cholesterol',200,300,250)
-
 
 # Load trained models, results
 scaler = pickle.load(open('std_scaler.sav','rb'))
@@ -53,7 +50,6 @@ input_rec = np.array([age_slider,bp_slider,chol_slider,input_sex]).reshape(1,-1)
 input_rec_std = scaler.transform(input_rec)
 
 probs_rec = model.predict_proba(input_rec_std)
-
 
 st.sidebar.metric('Heart Disease Probability',f'{probs_rec[0,1]*100:3.1f}%')
 
