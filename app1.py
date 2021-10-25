@@ -32,7 +32,7 @@ st.sidebar.subheader('Heart Disease Calculator')
 sex_button = st.sidebar.radio('Gender',('Male','Female'))
 age_slider = st.sidebar.slider('Age',20,100,60)
 bp_slider = st.sidebar.slider('Resting blood pressure',100,200,150)
-chol_slider = st.sidebar.slider('Serum cholesterol',200,300,250)
+chol_slider = st.sidebar.slider('Serum cholesterol',100,350,600)
 
 # Load trained models, results
 scaler = pickle.load(open('std_scaler.sav','rb'))
